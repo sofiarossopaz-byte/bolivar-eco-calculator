@@ -1,1216 +1,202 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Bolívar Eco-Calculator: calcula tu impacto ambiental y descubre tus Eco-Points.">
+    <meta name="description" content="Bolívar Eco-Calculator: calcula tu impacto ambiental.">
     <title>Bolívar Eco-Calculator</title>
 
-    <style>
-        :root {
-            --green-dark: #123c2c;
-            --green: #16834b;
-            --green-light: #e8f5ec;
-            --mint: #c9f2d6;
-            --text: #24352c;
-            --muted: #718078;
-            --white: #ffffff;
-            --border: #dce9df;
-            --shadow: 0 8px 25px rgba(20, 65, 42, 0.08);
-        }
+    <link rel="stylesheet" href="style.css">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    <!-- Biblioteca para generar archivos PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f3f8f4;
-            color: var(--text);
-            line-height: 1.6;
-        }
-
-        button, select, input {
-            font: inherit;
-        }
-
-        .container {
-            width: min(1100px, 92%);
-            margin: auto;
-        }
-
-        /* HEADER */
-        header {
-            background: var(--green-dark);
-            color: white;
-            padding: 18px 0;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .brand {
-            font-size: 1.25rem;
-            font-weight: 800;
-            letter-spacing: 0.2px;
-        }
-
-        .eco-badge {
-            display: inline-block;
-            margin-left: 8px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: #d1f5dc;
-            color: #145c35;
-            font-size: 0.7rem;
-            font-weight: 800;
-            vertical-align: middle;
-        }
-
-        .language-select {
-            padding: 9px 12px;
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 9px;
-            background: #20563e;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* HERO */
-        .hero {
-            text-align: center;
-            padding: 48px 15px 30px;
-        }
-
-        .hero h1 {
-            color: var(--green-dark);
-            font-size: clamp(1.8rem, 4vw, 2.6rem);
-            margin-bottom: 10px;
-        }
-
-        .hero p {
-            max-width: 650px;
-            margin: auto;
-            color: var(--muted);
-        }
-
-        /* MAIN LAYOUT */
-        main {
-            padding-bottom: 45px;
-        }
-
-        .calculator-card,
-        .information-card,
-        .feedback-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 28px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            color: var(--green-dark);
-            font-size: 1.35rem;
-            margin-bottom: 20px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-group label {
-            font-weight: 700;
-            font-size: 0.94rem;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cad9ce;
-            border-radius: 9px;
-            background: white;
-            color: var(--text);
-            outline: none;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .language-select:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(22, 131, 75, 0.13);
-        }
-
-        .helper-text {
-            color: var(--muted);
-            font-size: 0.82rem;
-        }
-
-        .button-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 10px;
-            padding: 13px 20px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn:focus-visible {
-            outline: 3px solid #7ed99e;
-            outline-offset: 3px;
-        }
-
-        .btn-primary {
-            background: var(--green);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #116b3c;
-        }
-
-        .btn-secondary {
-            background: var(--green-light);
-            color: var(--green-dark);
-            border: 1px solid #c9e5d1;
-        }
-
-        .btn-secondary:hover {
-            background: #d6efdd;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* MESSAGES */
-        .message {
-            margin-top: 18px;
-            padding: 12px 15px;
-            border-radius: 9px;
-            display: none;
-        }
-
-        .message.error {
-            display: block;
-            color: #8b2525;
-            background: #fff0f0;
-            border: 1px solid #f2caca;
-        }
-
-        .message.success {
-            display: block;
-            color: #145c35;
-            background: #e8f5ec;
-            border: 1px solid #c9e5d1;
-        }
-
-        /* RESULTS */
-        .results-section {
-            display: none;
-            margin-bottom: 24px;
-        }
-
-        .results-section.visible {
-            display: block;
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .result-card {
-            padding: 25px;
-            border-radius: 17px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            background: white;
-            text-align: center;
-        }
-
-        .co2-card {
-            border-top: 5px solid #16834b;
-        }
-
-        .points-card {
-            border-top: 5px solid #83bd50;
-        }
-
-        .result-icon {
-            font-size: 2rem;
-            margin-bottom: 8px;
-        }
-
-        .result-label {
-            color: var(--muted);
-            font-weight: 700;
-        }
-
-        .result-value {
-            color: var(--green-dark);
-            font-size: clamp(2rem, 5vw, 2.7rem);
-            font-weight: 800;
-            margin: 8px 0;
-        }
-
-        .result-unit {
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
-
-        .feedback-card {
-            background: var(--green-light);
-            border-color: #c9e5d1;
-        }
-
-        .feedback-card h3 {
-            color: var(--green-dark);
-            margin-bottom: 6px;
-        }
-
-        .feedback-card p {
-            color: #41624d;
-        }
-
-        /* INFORMATION */
-        .information-card p {
-            color: var(--muted);
-            margin-bottom: 10px;
-        }
-
-        .information-card ul {
-            padding-left: 22px;
-            color: var(--muted);
-        }
-
-        .information-card li {
-            margin-bottom: 5px;
-        }
-
-        .disclaimer {
-            font-size: 0.84rem;
-            font-style: italic;
-            margin-top: 14px;
-        }
-
-        /* CERTIFICATE - SCREEN */
-        #certificate {
-            display: none;
-        }
-
-        footer {
-            text-align: center;
-            padding: 22px 15px;
-            color: var(--muted);
-            font-size: 0.85rem;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 650px) {
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .form-grid,
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .calculator-card,
-            .information-card,
-            .feedback-card {
-                padding: 20px;
-            }
-
-            .button-row {
-                flex-direction: column;
-            }
-
-            .button-row .btn {
-                width: 100%;
-            }
-        }
-
-        /* PRINT CERTIFICATE */
-        @page {
-            size: A4 portrait;
-            margin: 15mm;
-        }
-
-        @media print {
-            html, body {
-                background: white !important;
-                color: #20352a !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            body * {
-                visibility: hidden !important;
-            }
-
-            #certificate,
-            #certificate * {
-                visibility: visible !important;
-            }
-
-            #certificate {
-                display: block !important;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                min-height: 250mm;
-                padding: 15mm 12mm;
-                border: 3px double #16834b;
-                border-radius: 0;
-                background: white !important;
-                color: #20352a !important;
-                font-family: Georgia, "Times New Roman", serif;
-                text-align: center;
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-
-            .certificate-topline {
-                color: #16834b;
-                font-family: Arial, sans-serif;
-                font-size: 11pt;
-                font-weight: bold;
-                letter-spacing: 3px;
-                text-transform: uppercase;
-                margin-bottom: 22px;
-            }
-
-            .certificate-logo {
-                font-family: Arial, sans-serif;
-                color: #145c35;
-                font-size: 20pt;
-                font-weight: 800;
-                margin-bottom: 30px;
-            }
-
-            .certificate-title {
-                color: #145c35;
-                font-size: 27pt;
-                line-height: 1.2;
-                margin: 15px 0;
-            }
-
-            .certificate-subtitle {
-                font-size: 12pt;
-                color: #52645a;
-                margin-bottom: 30px;
-            }
-
-            .certificate-recognition {
-                font-size: 14pt;
-                line-height: 1.7;
-                margin: 20px auto 30px;
-                max-width: 150mm;
-            }
-
-            .certificate-results {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
-                margin: 25px 0;
-            }
-
-            .certificate-metric {
-                border: 1px solid #a8cdb2;
-                padding: 18px 10px;
-                border-radius: 8px;
-                break-inside: avoid;
-            }
-
-            .certificate-metric strong {
-                display: block;
-                color: #145c35;
-                font-family: Arial, sans-serif;
-                font-size: 25pt;
-                margin-top: 8px;
-            }
-
-            .certificate-details {
-                margin: 25px auto;
-                width: 90%;
-                border-collapse: collapse;
-                text-align: left;
-                font-family: Arial, sans-serif;
-                font-size: 10.5pt;
-            }
-
-            .certificate-details td {
-                padding: 10px;
-                border-bottom: 1px solid #dce9df;
-            }
-
-            .certificate-details td:first-child {
-                font-weight: bold;
-                color: #145c35;
-                width: 48%;
-            }
-
-            .certificate-message {
-                background: #edf7ef !important;
-                border-left: 4px solid #16834b;
-                padding: 16px;
-                margin: 25px auto;
-                max-width: 150mm;
-                font-size: 12pt;
-                break-inside: avoid;
-            }
-
-            .certificate-footer {
-                margin-top: 35px;
-                padding-top: 15px;
-                border-top: 1px solid #a8cdb2;
-                font-family: Arial, sans-serif;
-                font-size: 9pt;
-                color: #66776c;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                scroll-behavior: auto !important;
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-            }
-        }
-    </style>
+    <script src="actions.js" defer></script>
 </head>
 
 <body>
 
-    <header>
-        <div class="container header-content">
-            <div class="brand">
-                Bolívar Eco-Calculator
-                <span class="eco-badge">ECO MODE</span>
-            </div>
+    <header class="header">
+        <h1 data-i18n="title">Bolívar Eco-Calculator</h1>
+        <p data-i18n="subtitle">Calcula tu impacto ambiental y mejora tus hábitos.</p>
 
-            <label>
-                <span class="helper-text" style="color:#ffffff; margin-right:6px;" data-i18n="languageLabel">Idioma</span>
-                <select id="languageSelect" class="language-select" aria-label="Select language">
-                    <option value="es">🇪🇸 Español</option>
-                    <option value="en">🇬🇧 English</option>
-                </select>
-            </label>
-        </div>
+        <label for="languageSelect" data-i18n="languageLabel">Idioma:</label>
+        <select id="languageSelect">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+        </select>
     </header>
-
-    <section class="hero">
-        <div class="container">
-            <h1 data-i18n="heroTitle">Calcula tu impacto ambiental</h1>
-            <p data-i18n="heroDescription">
-                Descubre cómo tus hábitos diarios influyen en el medio ambiente
-                y conoce tu puntaje ecológico.
-            </p>
-        </div>
-    </section>
 
     <main class="container">
 
-        <!-- CALCULATOR FORM -->
-        <section class="calculator-card">
-            <h2 class="section-title" data-i18n="formTitle">Tu evaluación ecológica</h2>
+        <section class="card">
+            <h2 data-i18n="formTitle">Calculadora ecológica</h2>
 
-            <form id="ecoForm" novalidate>
-                <div class="form-grid">
+            <form id="ecoForm">
 
-                    <div class="form-group">
-                        <label for="transporte" data-i18n="transportLabel">
-                            ¿Cómo te transportas al colegio?
-                        </label>
-                        <select id="transporte" required>
-                            <option value="" data-i18n="selectOption">Selecciona una opción</option>
-                            <option value="bus" data-i18n="bus">Bus</option>
-                            <option value="privado" data-i18n="privateCar">Carro privado</option>
-                            <option value="compartido" data-i18n="sharedCar">Carro compartido</option>
-                            <option value="sostenible" data-i18n="sustainable">Bicicleta / Caminando</option>
-                        </select>
-                    </div>
+                <label for="transporte" data-i18n="transportLabel">
+                    ¿Cómo te transportas al colegio?
+                </label>
 
-                    <div class="form-group">
-                        <label for="papel" data-i18n="paperLabel">
-                            ¿Cuántas hojas de papel utilizas al día?
-                        </label>
-                        <input
-                            type="number"
-                            id="papel"
-                            min="0"
-                            max="500"
-                            step="1"
-                            placeholder="Ej. 10"
-                            data-i18n-placeholder="paperPlaceholder"
-                            required
-                        >
-                        <span class="helper-text" data-i18n="paperHelp">
-                            Introduce un número entero entre 0 y 500.
-                        </span>
-                    </div>
+                <select id="transporte" required>
+                    <option value="" data-i18n="selectOption">Selecciona una opción</option>
+                    <option value="bus" data-i18n="bus">Bus</option>
+                    <option value="privado" data-i18n="privateCar">Carro privado</option>
+                    <option value="compartido" data-i18n="sharedCar">Carro compartido</option>
+                    <option value="sostenible" data-i18n="sustainable">Bicicleta o caminando</option>
+                </select>
 
-                    <div class="form-group">
-                        <label for="reciclaje" data-i18n="recyclingLabel">
-                            ¿Cuál es tu nivel de reciclaje?
-                        </label>
-                        <select id="reciclaje" required>
-                            <option value="" data-i18n="selectOption">Selecciona una opción</option>
-                            <option value="bajo" data-i18n="low">Bajo</option>
-                            <option value="medio" data-i18n="medium">Medio</option>
-                            <option value="alto" data-i18n="high">Alto</option>
-                        </select>
-                    </div>
+                <label for="papel" data-i18n="paperLabel">
+                    ¿Cuántas hojas de papel utilizas al día?
+                </label>
 
-                </div>
+                <input
+                    type="number"
+                    id="papel"
+                    min="0"
+                    max="1000"
+                    step="1"
+                    placeholder="Ej. 10"
+                    required
+                >
 
-                <div class="button-row">
-                    <button type="submit" class="btn btn-primary" data-i18n="calculateButton">
-                        Calcular impacto ambiental
-                    </button>
+                <label for="reciclaje" data-i18n="recyclingLabel">
+                    ¿Cuál es tu nivel de reciclaje?
+                </label>
 
-                    <button
-                        type="button"
-                        id="printReportButton"
-                        class="btn btn-secondary"
-                        disabled
-                        data-i18n="printButton"
-                    >
-                        Imprimir / Guardar Reporte PDF
-                    </button>
-                </div>
+                <select id="reciclaje" required>
+                    <option value="" data-i18n="selectOption">Selecciona una opción</option>
+                    <option value="bajo" data-i18n="low">Bajo</option>
+                    <option value="medio" data-i18n="medium">Medio</option>
+                    <option value="alto" data-i18n="high">Alto</option>
+                </select>
 
-                <div id="mensaje" class="message" role="status" aria-live="polite"></div>
+                <button type="submit" class="primary-button" data-i18n="calculate">
+                    Calcular impacto
+                </button>
+
             </form>
+
+            <p id="mensaje" role="status" aria-live="polite"></p>
         </section>
 
-        <!-- RESULTS -->
-        <section id="resultados" class="results-section" aria-live="polite">
-            <h2 class="section-title" data-i18n="resultsTitle">Tus resultados ambientales</h2>
+        <section id="resultados" class="results-section" hidden>
+
+            <h2 data-i18n="resultsTitle">Tus resultados</h2>
 
             <div class="results-grid">
 
-                <article class="result-card co2-card">
-                    <div class="result-icon" aria-hidden="true">🌍</div>
-                    <p class="result-label" data-i18n="co2Label">Huella de carbono semanal</p>
-                    <div class="result-value" id="co2Resultado">0.00</div>
-                    <p class="result-unit">kg CO₂e</p>
+                <article class="result-card">
+                    <h3 data-i18n="co2Title">Huella de carbono semanal</h3>
+                    <p id="co2Resultado">0 kg CO₂e</p>
                 </article>
 
-                <article class="result-card points-card">
-                    <div class="result-icon" aria-hidden="true">🌱</div>
-                    <p class="result-label" data-i18n="pointsLabel">Eco-Points</p>
-                    <div class="result-value" id="ecoResultado">0</div>
-                    <p class="result-unit" data-i18n="pointsUnit">de 100 puntos</p>
+                <article class="result-card">
+                    <h3 data-i18n="ecoTitle">Eco-Points</h3>
+                    <p id="ecoResultado">0 / 100</p>
                 </article>
 
             </div>
 
-            <article class="feedback-card">
-                <h3 data-i18n="feedbackTitle">Tu evaluación ecológica</h3>
-                <p id="interpretacion"></p>
-            </article>
+            <p id="interpretacion" class="interpretation"></p>
+
+            <div class="certificate-actions">
+
+                <button
+                    type="button"
+                    id="printCertificateButton"
+                    class="secondary-button"
+                    disabled
+                    data-i18n="printButton"
+                >
+                    Imprimir certificado
+                </button>
+
+                <button
+                    type="button"
+                    id="savePdfButton"
+                    class="primary-button"
+                    disabled
+                    data-i18n="pdfButton"
+                >
+                    Guardar como PDF
+                </button>
+
+            </div>
         </section>
 
-        <!-- METHODOLOGY -->
-        <section class="information-card">
-            <h2 class="section-title" data-i18n="methodTitle">¿Cómo funciona la calculadora?</h2>
+        <!-- CERTIFICADO -->
+        <section id="certificate" class="certificate">
 
-            <p data-i18n="methodDescription">
-                Esta herramienta utiliza factores educativos simplificados para
-                estimar el impacto ambiental de algunos hábitos cotidianos.
-            </p>
+            <div class="certificate-header">
+                <h1 data-i18n="certificateTitle">
+                    Certificado de Impacto Ambiental
+                </h1>
 
-            <ul>
-                <li data-i18n="methodTransport">Se considera el medio de transporte utilizado durante la semana.</li>
-                <li data-i18n="methodPaper">Se estima el impacto del consumo diario de papel.</li>
-                <li data-i18n="methodRecycling">Se aplica una reducción estimada según el nivel de reciclaje.</li>
-                <li data-i18n="methodPoints">Se asignan Eco-Points según los hábitos ambientales seleccionados.</li>
-            </ul>
-
-            <p class="disclaimer" data-i18n="disclaimer">
-                Nota: los resultados son estimaciones educativas y no representan
-                mediciones científicas exactas de la huella de carbono.
-            </p>
-        </section>
-
-        <!-- PRINTABLE CERTIFICATE -->
-        <section id="certificate" aria-label="Environmental impact certificate">
-            <div class="certificate-topline" data-i18n="certificateTopline">
-                Reconocimiento ambiental
+                <p data-i18n="certificateSubtitle">
+                    Bolívar Eco-Calculator
+                </p>
             </div>
 
-            <div class="certificate-logo">🌿 Bolívar Eco-Calculator</div>
+            <div class="certificate-body">
 
-            <h1 class="certificate-title" data-i18n="certificateTitle">
-                Certificado de Impacto Ambiental
-            </h1>
+                <p data-i18n="certificateRecognition">
+                    ¡Felicitaciones por participar en el cuidado del planeta!
+                </p>
 
-            <p class="certificate-subtitle" data-i18n="certificateSubtitle">
-                Reconocimiento por participar en la evaluación ecológica
-            </p>
-
-            <p class="certificate-recognition" data-i18n="certificateRecognition">
-                Este certificado reconoce tu participación y compromiso con
-                el cuidado del medio ambiente. Cada decisión sostenible
-                contribuye a construir un futuro mejor.
-            </p>
-
-            <div class="certificate-results">
-                <div class="certificate-metric">
-                    <span data-i18n="co2Label">Huella de carbono semanal</span>
-                    <strong id="certificateCo2">0.00</strong>
-                    <span>kg CO₂e</span>
+                <div class="certificate-result">
+                    <h2 data-i18n="co2Title">Huella de carbono semanal</h2>
+                    <p id="certificateCO2">0 kg CO₂e</p>
                 </div>
 
-                <div class="certificate-metric">
-                    <span data-i18n="pointsLabel">Eco-Points</span>
-                    <strong id="certificatePoints">0 / 100</strong>
-                    <span data-i18n="pointsUnit">de 100 puntos</span>
+                <div class="certificate-result">
+                    <h2 data-i18n="ecoTitle">Eco-Points</h2>
+                    <p id="certificateEco">0 / 100</p>
                 </div>
-            </div>
 
-            <table class="certificate-details">
-                <tbody>
-                    <tr>
-                        <td data-i18n="certificateTransport">Medio de transporte</td>
-                        <td id="certificateTransport">—</td>
-                    </tr>
-                    <tr>
-                        <td data-i18n="certificatePaper">Consumo diario de papel</td>
-                        <td id="certificatePaper">—</td>
-                    </tr>
-                    <tr>
-                        <td data-i18n="certificateRecycling">Nivel de reciclaje</td>
-                        <td id="certificateRecycling">—</td>
-                    </tr>
-                    <tr>
-                        <td data-i18n="certificateDate">Fecha de generación</td>
-                        <td id="certificateDate">—</td>
-                    </tr>
-                </tbody>
-            </table>
+                <h3 data-i18n="habitsTitle">Tus hábitos ambientales</h3>
 
-            <div class="certificate-message">
-                <strong data-i18n="certificateThanksTitle">¡Gracias por cuidar el planeta!</strong>
-                <p id="certificateMessage"></p>
+                <ul>
+                    <li>
+                        <strong data-i18n="transportLabel">Transporte:</strong>
+                        <span id="certificateTransport"></span>
+                    </li>
+
+                    <li>
+                        <strong data-i18n="paperLabel">Consumo de papel:</strong>
+                        <span id="certificatePaper"></span>
+                    </li>
+
+                    <li>
+                        <strong data-i18n="recyclingLabel">Nivel de reciclaje:</strong>
+                        <span id="certificateRecycling"></span>
+                    </li>
+                </ul>
+
+                <p id="certificateMessage" class="certificate-message"></p>
+
+                <p class="certificate-date">
+                    <strong data-i18n="dateLabel">Fecha de generación:</strong>
+                    <span id="certificateDate"></span>
+                </p>
+
             </div>
 
             <div class="certificate-footer">
                 <p data-i18n="certificateFooter">
-                    Bolívar Eco-Calculator · Pequeñas acciones, grandes cambios.
+                    Cada acción cuenta. ¡Sigamos cuidando nuestro planeta!
                 </p>
             </div>
+
         </section>
 
     </main>
 
-    <footer>
-        <p data-i18n="footerText">
-            Bolívar Eco-Calculator · Aprende, calcula y actúa por el planeta.
+    <footer class="footer">
+        <p data-i18n="footer">
+            Bolívar Eco-Calculator | Educación ambiental
         </p>
     </footer>
-
-    <script>
-        // ==========================================
-        // 1. DICCIONARIO DE TRADUCCIONES
-        // ==========================================
-
-        const translations = {
-            es: {
-                languageLabel: "Idioma",
-                heroTitle: "Calcula tu impacto ambiental",
-                heroDescription: "Descubre cómo tus hábitos diarios influyen en el medio ambiente y conoce tu puntaje ecológico.",
-                formTitle: "Tu evaluación ecológica",
-                transportLabel: "¿Cómo te transportas al colegio?",
-                selectOption: "Selecciona una opción",
-                bus: "Bus",
-                privateCar: "Carro privado",
-                sharedCar: "Carro compartido",
-                sustainable: "Bicicleta / Caminando",
-                paperLabel: "¿Cuántas hojas de papel utilizas al día?",
-                paperPlaceholder: "Ej. 10",
-                paperHelp: "Introduce un número entero entre 0 y 500.",
-                recyclingLabel: "¿Cuál es tu nivel de reciclaje?",
-                low: "Bajo",
-                medium: "Medio",
-                high: "Alto",
-                calculateButton: "Calcular impacto ambiental",
-                printButton: "Imprimir / Guardar Reporte PDF",
-                resultsTitle: "Tus resultados ambientales",
-                co2Label: "Huella de carbono semanal",
-                pointsLabel: "Eco-Points",
-                pointsUnit: "de 100 puntos",
-                feedbackTitle: "Tu evaluación ecológica",
-                methodTitle: "¿Cómo funciona la calculadora?",
-                methodDescription: "Esta herramienta utiliza factores educativos simplificados para estimar el impacto ambiental de algunos hábitos cotidianos.",
-                methodTransport: "Se considera el medio de transporte utilizado durante la semana.",
-                methodPaper: "Se estima el impacto del consumo diario de papel.",
-                methodRecycling: "Se aplica una reducción estimada según el nivel de reciclaje.",
-                methodPoints: "Se asignan Eco-Points según los hábitos ambientales seleccionados.",
-                disclaimer: "Nota: los resultados son estimaciones educativas y no representan mediciones científicas exactas de la huella de carbono.",
-                footerText: "Bolívar Eco-Calculator · Aprende, calcula y actúa por el planeta.",
-
-                errorTransport: "Por favor, selecciona un medio de transporte.",
-                errorPaper: "Introduce una cantidad válida de hojas de papel entre 0 y 500.",
-                errorRecycling: "Por favor, selecciona un nivel de reciclaje.",
-                errorPrint: "Primero debes completar el formulario y calcular tu impacto ambiental.",
-                successMessage: "¡Cálculo realizado correctamente! Ya puedes generar tu certificado.",
-
-                excellent: "¡Excelente trabajo! Tus hábitos reflejan un gran compromiso con el medio ambiente.",
-                good: "¡Buen trabajo! Estás adoptando hábitos que ayudan a cuidar nuestro planeta.",
-                progress: "¡Vas por buen camino! Puedes mejorar aún más tus hábitos sostenibles.",
-                improve: "Cada pequeño cambio cuenta. Puedes mejorar tus hábitos para reducir tu impacto ambiental.",
-
-                certificateTopline: "Reconocimiento ambiental",
-                certificateTitle: "Certificado de Impacto Ambiental",
-                certificateSubtitle: "Reconocimiento por participar en la evaluación ecológica",
-                certificateRecognition: "Este certificado reconoce tu participación y compromiso con el cuidado del medio ambiente. Cada decisión sostenible contribuye a construir un futuro mejor.",
-                certificateTransport: "Medio de transporte",
-                certificatePaper: "Consumo diario de papel",
-                certificateRecycling: "Nivel de reciclaje",
-                certificateDate: "Fecha de generación",
-                certificateThanksTitle: "¡Gracias por cuidar el planeta!",
-                certificateFooter: "Bolívar Eco-Calculator · Pequeñas acciones, grandes cambios.",
-                certificateMessage: "Tu participación demuestra que las acciones individuales pueden contribuir a un planeta más sostenible.",
-                paperUnit: "hojas por día"
-            },
-
-            en: {
-                languageLabel: "Language",
-                heroTitle: "Calculate your environmental impact",
-                heroDescription: "Discover how your daily habits affect the environment and learn your ecological score.",
-                formTitle: "Your environmental assessment",
-                transportLabel: "How do you travel to school?",
-                selectOption: "Select an option",
-                bus: "Bus",
-                privateCar: "Private car",
-                sharedCar: "Carpool",
-                sustainable: "Bicycle / Walking",
-                paperLabel: "How many sheets of paper do you use daily?",
-                paperPlaceholder: "E.g. 10",
-                paperHelp: "Enter a whole number between 0 and 500.",
-                recyclingLabel: "What is your recycling level?",
-                low: "Low",
-                medium: "Medium",
-                high: "High",
-                calculateButton: "Calculate environmental impact",
-                printButton: "Print / Save PDF Report",
-                resultsTitle: "Your environmental results",
-                co2Label: "Weekly carbon footprint",
-                pointsLabel: "Eco-Points",
-                pointsUnit: "out of 100 points",
-                feedbackTitle: "Your ecological assessment",
-                methodTitle: "How does the calculator work?",
-                methodDescription: "This tool uses simplified educational factors to estimate the environmental impact of some everyday habits.",
-                methodTransport: "The means of transportation used during the week is considered.",
-                methodPaper: "The impact of daily paper consumption is estimated.",
-                methodRecycling: "An estimated reduction is applied according to the recycling level.",
-                methodPoints: "Eco-Points are assigned according to the selected environmental habits.",
-                disclaimer: "Note: results are educational estimates and do not represent exact scientific measurements of your carbon footprint.",
-                footerText: "Bolívar Eco-Calculator · Learn, calculate, and take action for the planet.",
-
-                errorTransport: "Please select a means of transportation.",
-                errorPaper: "Enter a valid number of paper sheets between 0 and 500.",
-                errorRecycling: "Please select a recycling level.",
-                errorPrint: "You must complete the form and calculate your environmental impact first.",
-                successMessage: "Calculation completed successfully! You can now generate your certificate.",
-
-                excellent: "Excellent work! Your habits show a strong commitment to the environment.",
-                good: "Great job! You are adopting habits that help protect our planet.",
-                progress: "You are on the right track! You can improve your sustainable habits even more.",
-                improve: "Every small change counts. You can improve your habits to reduce your environmental impact.",
-
-                certificateTopline: "Environmental recognition",
-                certificateTitle: "Environmental Impact Certificate",
-                certificateSubtitle: "Recognition for participating in the ecological assessment",
-                certificateRecognition: "This certificate recognizes your participation and commitment to protecting the environment. Every sustainable decision helps build a better future.",
-                certificateTransport: "Means of transportation",
-                certificatePaper: "Daily paper consumption",
-                certificateRecycling: "Recycling level",
-                certificateDate: "Date generated",
-                certificateThanksTitle: "Thank you for caring for the planet!",
-                certificateFooter: "Bolívar Eco-Calculator · Small actions, big changes.",
-                certificateMessage: "Your participation shows that individual actions can contribute to a more sustainable planet.",
-                paperUnit: "sheets per day"
-            }
-        };
-
-
-        // ==========================================
-        // 2. VARIABLES Y ELEMENTOS DEL DOM
-        // ==========================================
-
-        const ecoForm = document.getElementById("ecoForm");
-        const transporteInput = document.getElementById("transporte");
-        const papelInput = document.getElementById("papel");
-        const reciclajeInput = document.getElementById("reciclaje");
-
-        const mensaje = document.getElementById("mensaje");
-        const resultados = document.getElementById("resultados");
-        const co2Resultado = document.getElementById("co2Resultado");
-        const ecoResultado = document.getElementById("ecoResultado");
-        const interpretacion = document.getElementById("interpretacion");
-
-        const languageSelect = document.getElementById("languageSelect");
-        const printReportButton = document.getElementById("printReportButton");
-
-        let currentLanguage = "es";
-        let lastCalculation = null;
-
-
-        // ==========================================
-        // 3. FACTORES Y CRITERIOS ORIGINALES
-        // ==========================================
-
-        const factoresTransporte = {
-            bus: 0.08,
-            privado: 0.19,
-            compartido: 0.095,
-            sostenible: 0
-        };
-
-        const factorPapel = 0.005;
-        const distanciaDiaria = 10;
-        const diasSemana = 5;
-
-        const reduccionReciclaje = {
-            bajo: 0,
-            medio: 0.10,
-            alto: 0.20
-        };
-
-        const puntosTransporte = {
-            sostenible: 40,
-            compartido: 30,
-            bus: 25,
-            privado: 10
-        };
-
-        const puntosReciclaje = {
-            bajo: 5,
-            medio: 20,
-            alto: 30
-        };
-
-
-        // ==========================================
-        // 4. SISTEMA DE IDIOMAS
-        // ==========================================
-
-        function translate(key) {
-            return translations[currentLanguage][key] || key;
-        }
-
-        function applyLanguage(language) {
-            if (!translations[language]) return;
-
-            currentLanguage = language;
-            document.documentElement.lang = language;
-            languageSelect.value = language;
-
-            // Traducir textos de la interfaz.
-            document.querySelectorAll("[data-i18n]").forEach(element => {
-                const key = element.dataset.i18n;
-                element.textContent = translate(key);
-            });
-
-            // Traducir placeholders.
-            document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
-                const key = element.dataset.i18nPlaceholder;
-                element.placeholder = translate(key);
-            });
-
-            // Actualizar resultados y mensajes en el idioma seleccionado.
-            if (lastCalculation) {
-                updateResultsLanguage();
-                updateCertificate();
-            }
-
-            // Actualizar un mensaje que esté visible.
-            if (mensaje.classList.contains("error")) {
-                showMessage(translate(mensaje.dataset.translationKey || "errorPrint"), "error");
-            } else if (mensaje.classList.contains("success")) {
-                showMessage(translate("successMessage"), "success");
-            }
-        }
-
-        languageSelect.addEventListener("change", function () {
-            applyLanguage(this.value);
-        });
-
-
-        // ==========================================
-        // 5. FUNCIONES DE CÁLCULO
-        // ==========================================
-
-        function calculateCO2(transporte, hojas, reciclaje) {
-            const co2Transporte =
-                factoresTransporte[transporte] * distanciaDiaria * diasSemana;
-
-            const co2Papel =
-                hojas * diasSemana * factorPapel *
-                (1 - reduccionReciclaje[reciclaje]);
-
-            return co2Transporte + co2Papel;
-        }
-
-        function calculateEcoPoints(transporte, hojas, reciclaje) {
-            const puntosTransporteSeleccionado =
-                puntosTransporte[transporte];
-
-            let puntosPapel;
-
-            if (hojas <= 5) {
-                puntosPapel = 30;
-            } else if (hojas <= 10) {
-                puntosPapel = 24;
-            } else if (hojas <= 20) {
-                puntosPapel = 15;
-            } else {
-                puntosPapel = 5;
-            }
-
-            const puntosReciclajeSeleccionado =
-                puntosReciclaje[reciclaje];
-
-            return puntosTransporteSeleccionado +
-                   puntosPapel +
-                   puntosReciclajeSeleccionado;
-        }
-
-        function getInterpretation(points) {
-            if (points >= 80) {
-                return translate("excellent");
-            } else if (points >= 60) {
-                return translate("good");
-            } else if (points >= 40) {
-                return translate("progress");
-            }
-
-            return translate("improve");
-        }
-
-
-        // ==========================================
-        // 6. MENSAJES Y RESULTADOS
-        // ==========================================
-
-        function showMessage(text, type, translationKey = "") {
-            mensaje.textContent = text;
-            mensaje.className = "message " + type;
-            mensaje.dataset.translationKey = translationKey;
-        }
-
-        function clearMessage() {
-            mensaje.textContent = "";
-            mensaje.className = "message";
-            delete mensaje.dataset.translationKey;
-        }
-
-        function updateResultsLanguage() {
-            if (!lastCalculation) return;
-
-            interpretacion.textContent =
-                getInterpretation(lastCalculation.points);
-        }
-
-        function displayResults(co2, points) {
-            co2Resultado.textContent = co2.toFixed(2);
-            ecoResultado.textContent = points;
-            interpretacion.textContent = getInterpretation(points);
-
-            resultados.classList.add("visible");
-        }
-
-
-        // ==========================================
-        // 7. PROCESAMIENTO DEL FORMULARIO
-        // ==========================================
-
-        ecoForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            clearMessage();
-
-            const transporte = transporteInput.value;
-            const papel = papelInput.value.trim();
-            const reciclaje = reciclajeInput.value;
-
-            const hojas = Number(papel);
-
-            // Validaciones.
-            if (!transporte) {
-                showMessage(translate("errorTransport"), "error", "errorTransport");
-                transporteInput.focus();
-                return;
-            }
-
-            if (
-                papel === "" ||
-                !Number.isInteger(hojas) ||
-                hojas < 0 ||
-                hojas > 500
-            ) {
-                showMessage(translate("errorPaper"), "error", "errorPaper");
-                papelInput.focus();
-                return;
-            }
-
-            if (!reciclaje) {
-                showMessage(translate("errorRecycling"), "error", "errorRecycling");
-                reciclajeInput.focus();
-                return;
-            }
-
-            // Cálculos originales.
-            const co2 = calculateCO2(transporte, hojas, reciclaje);
-            const points = calculateEcoPoints(transporte, hojas, reciclaje);
-
-            // Guardar los datos de la última evaluación.
-            lastCalculation = {
-                transporte,
-                hojas,
-                reciclaje,
-                co2,
-                points,
-                date: new Date()
-            };
-
-            displayResults(co2, points);
-
-            printReportButton.disabled = false;
-
-            showMessage(translate("successMessage"), "success");
-
-            updateCertificate();
-        });
-
-
-        // ==========================================
-        // 8. GENERACIÓN DEL CERTIFICADO
-        // ==========================================
-
-        function getTransportLabel(value) {
-            const labels = {
-                bus: "bus",
-                privado: "privateCar",
-                compartido: "sharedCar",
-                sostenible: "sustainable"
-            };
-
-            return translate(labels[value]);
-        }
-
-        function getRecyclingLabel(value) {
-            const labels = {
-                bajo: "low",
-                medio: "medium",
-                alto: "high"
-            };
-
-            return translate(labels[value]);
-        }
-
-        function updateCertificate() {
-            if (!lastCalculation) return;
-
-            const data = lastCalculation;
-
-            // Resultados.
-            document.getElementById("certificateCo2").textContent =
-                data.co2.toFixed(2);
-
-            document.getElementById("certificatePoints").textContent =
-                data.points + " / 100";
-
-            // Hábitos seleccionados.
-            document.getElementById("certificateTransport").textContent =
-                getTransportLabel(data.transporte);
-
-            document.getElementById("certificatePaper").textContent =
-                data.hojas + " " + translate("paperUnit");
-
-            document.getElementById("certificateRecycling").textContent =
-                getRecyclingLabel(data.reciclaje);
-
-            // Fecha según el idioma.
-            const locale = currentLanguage === "es" ? "es-CO" : "en-US";
-
-            document.getElementById("certificateDate").textContent =
-                new Intl.DateTimeFormat(locale, {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                }).format(data.date);
-
-            // Mensaje del certificado.
-            document.getElementById("certificateMessage").textContent =
-                translate("certificateMessage");
-        }
-
-
-        // ==========================================
-        // 9. IMPRESIÓN Y GUARDADO COMO PDF
-        // ==========================================
-
-        printReportButton.addEventListener("click", function () {
-            if (!lastCalculation) {
-                showMessage(translate("errorPrint"), "error", "errorPrint");
-                return;
-            }
-
-            updateCertificate();
-
-            // El certificado se hace visible exclusivamente durante la impresión.
-            const certificate = document.getElementById("certificate");
-            certificate.style.display = "block";
-
-            window.print();
-        });
-
-        // Restaurar el estado visual después de cerrar el diálogo.
-        window.addEventListener("afterprint", function () {
-            document.getElementById("certificate").style.display = "none";
-        });
-
-    </script>
 
 </body>
 </html>

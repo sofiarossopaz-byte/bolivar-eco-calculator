@@ -1,0 +1,356 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef7f0;
+    color: #244333;
+    line-height: 1.6;
+}
+
+.header {
+    background: #145c3b;
+    color: white;
+    text-align: center;
+    padding: 35px 20px;
+}
+
+.header h1 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.header select {
+    margin-top: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+}
+
+.container {
+    width: 90%;
+    max-width: 850px;
+    margin: 35px auto;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+.card h2,
+.results-section h2 {
+    color: #176b45;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+form label {
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #c8d9cd;
+    border-radius: 7px;
+    font-size: 1rem;
+    background: white;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 3px solid #8bd6a9;
+    outline-offset: 3px;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.primary-button {
+    background: #16834e;
+    color: white;
+    margin-top: 15px;
+}
+
+.primary-button:hover:not(:disabled) {
+    background: #10683e;
+}
+
+.secondary-button {
+    background: #dceee2;
+    color: #145c3b;
+    margin-top: 15px;
+}
+
+.secondary-button:hover:not(:disabled) {
+    background: #c4e3ce;
+}
+
+#mensaje {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #a33b30;
+}
+
+.results-section {
+    margin-top: 30px;
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.result-card {
+    background: #e4f4e9;
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+}
+
+.result-card h3 {
+    color: #176b45;
+    font-size: 1rem;
+}
+
+.result-card p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #145c3b;
+    margin-top: 10px;
+}
+
+.interpretation {
+    text-align: center;
+    margin-top: 22px;
+    font-weight: bold;
+    color: #176b45;
+}
+
+.certificate-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.footer {
+    text-align: center;
+    background: #145c3b;
+    color: white;
+    padding: 20px;
+    margin-top: 50px;
+}
+
+/* Certificado normal: oculto en la página */
+#certificate {
+    display: none;
+    background: white;
+    color: #244333;
+    width: 100%;
+    max-width: 800px;
+    padding: 45px;
+    margin: 0 auto;
+}
+
+.certificate-header {
+    text-align: center;
+    border-bottom: 3px solid #16834e;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+
+.certificate-header h1 {
+    color: #145c3b;
+    font-size: 2rem;
+}
+
+.certificate-header p {
+    color: #16834e;
+    font-weight: bold;
+}
+
+.certificate-body {
+    text-align: center;
+}
+
+.certificate-result {
+    background: #e4f4e9;
+    padding: 18px;
+    border-radius: 10px;
+    margin: 18px 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.certificate-result h2 {
+    color: #176b45;
+    font-size: 1.1rem;
+}
+
+.certificate-result p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #145c3b;
+}
+
+.certificate-body h3 {
+    margin-top: 25px;
+    color: #145c3b;
+}
+
+.certificate-body ul {
+    display: inline-block;
+    text-align: left;
+    margin: 15px auto;
+}
+
+.certificate-body li {
+    margin: 7px 0;
+}
+
+.certificate-message {
+    font-weight: bold;
+    color: #16834e;
+    margin: 20px 0;
+}
+
+.certificate-date {
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.certificate-footer {
+    border-top: 2px solid #16834e;
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    font-weight: bold;
+}
+
+/*
+  Copia temporal utilizada exclusivamente
+  para generar el PDF.
+*/
+.pdf-export-wrapper {
+    position: fixed;
+    top: 0;
+    left: -10000px;
+    width: 794px;
+    background: white;
+    z-index: -1;
+}
+
+#certificate.pdf-export-copy {
+    display: block !important;
+    position: static !important;
+    width: 794px !important;
+    max-width: none !important;
+    min-height: 900px;
+    padding: 45px !important;
+    margin: 0 !important;
+    background: white !important;
+    color: #244333 !important;
+    visibility: visible !important;
+}
+
+#certificate.pdf-export-copy * {
+    visibility: visible !important;
+}
+
+/* Impresión: solamente el certificado */
+@media print {
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
+
+    body {
+        background: white;
+    }
+
+    body * {
+        visibility: hidden !important;
+    }
+
+    #certificate,
+    #certificate * {
+        visibility: visible !important;
+    }
+
+    #certificate {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-width: none;
+        padding: 20px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card,
+    .results-section {
+        padding: 20px;
+    }
+
+    .certificate-actions {
+        flex-direction: column;
+    }
+
+    .certificate-actions button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
