@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,6 +7,295 @@
     <title>Bolívar Eco-Calculator</title>
 </head>
 <body>
+
     <h1>Bolívar Eco-Calculator</h1>
+
+    <h2>Calculadora de impacto ambiental</h2>
+
+    <form id="ecoForm">
+
+        <!-- Selección del medio de transporte -->
+        <label for="transporte">Medio de transporte al colegio:</label>
+        <select id="transporte" required>
+            <option value="">Selecciona una opción</option>
+            <option value="bus">Bus</option>
+            <option value="privado">Carro privado</option>
+            <option value="compartido">Carro compartido</option>
+            <option value="sostenible">Bicicleta/Caminando</option>
+        </select>
+
+        <br><br>
+
+        <!-- Cantidad de hojas utilizadas -->
+        <label for="papel">Hojas de papel utilizadas al día:</label>
+        <input
+            type="number"
+            id="papel"
+            min="0"
+            max="500"
+            step="1"
+            placeholder="Ejemplo: 10"
+            required
+        >
+
+        <br><br>
+
+        <!-- Nivel de reciclaje -->
+        <label for="reciclaje">Nivel de reciclaje:</label>
+        <select id="reciclaje" required>
+            <option value="">Selecciona una opción</option>
+            <option value="bajo">Bajo</option>
+            <option value="medio">Medio</option>
+            <option value="alto">Alto</option>
+        </select>
+
+        <br><br>
+
+        <!-- Botón de cálculo -->
+        <button type="submit">Calcular impacto ambiental</button>
+
+    </form>
+
+    <br>
+
+    <!-- Mensajes de validación -->
+    <p id="mensaje" role="alert"></p>
+
+    <!-- Resultados -->
+    <section id="resultados" hidden aria-live="polite">
+
+        <h2>Resultados ambientales</h2>
+
+        <p>
+            Huella de carbono semanal:
+            <strong id="co2Resultado"></strong>
+            kg CO₂e
+        </p>
+
+        <p>
+            Puntaje ecológico:
+            <strong id="ecoResultado"></strong>
+            Eco-Points
+        </p>
+
+        <p id="interpretacion"></p>
+
+    </section>
+
+    <!-- Explicación de los cálculos -->
+    <section>
+        <h2>Metodología de cálculo</h2>
+
+        <p>
+            Los resultados son estimaciones educativas basadas
+            en factores de emisión y hábitos ambientales.
+        </p>
+
+        <p>
+            Se considera una distancia de 10 km diarios
+            (ida y regreso al colegio), durante 5 días a la semana.
+        </p>
+
+        <p>
+            Factor de emisión del papel:
+            0.005 kg CO₂e por hoja.
+        </p>
+
+        <p>
+            Los factores de transporte se expresan en kg CO₂e
+            por pasajero y kilómetro.
+        </p>
+    </section>
+
+    <script>
+
+        // ==========================================
+        // 1. FACTORES DE EMISIÓN
+        // ==========================================
+
+        const factoresTransporte = {
+            bus: 0.08,
+            privado: 0.19,
+            compartido: 0.095,
+            sostenible: 0
+        };
+
+        const factorPapel = 0.005;
+
+        // Distancia diaria de ida y regreso
+        const distanciaDiaria = 10;
+
+        // Días de asistencia al colegio por semana
+        const diasSemana = 5;
+
+        // Reducción estimada del impacto del papel
+        // según el nivel de reciclaje.
+        const reduccionReciclaje = {
+            bajo: 0,
+            medio: 0.10,
+            alto: 0.20
+        };
+
+
+        // ==========================================
+        // 2. FUNCIÓN PARA CALCULAR CO2
+        // ==========================================
+
+        function calcularCO2(transporte, hojas, reciclaje) {
+
+            // Emisiones semanales del transporte
+            const co2Transporte =
+                factoresTransporte[transporte] *
+                distanciaDiaria *
+                diasSemana;
+
+            // Emisiones semanales del consumo de papel
+            const co2Papel =
+                hojas *
+                diasSemana *
+                factorPapel *
+                (1 - reduccionReciclaje[reciclaje]);
+
+            // Huella de carbono semanal total
+            return co2Transporte + co2Papel;
+        }
+
+
+        // ==========================================
+        // 3. FUNCIÓN PARA CALCULAR ECO-POINTS
+        // ==========================================
+
+        function calcularEcoPoints(transporte, hojas, reciclaje) {
+
+            // Puntos por medio de transporte (máximo 40)
+            const puntosTransporte = {
+                sostenible: 40,
+                compartido: 30,
+                bus: 25,
+                privado: 10
+            };
+
+            // Puntos por consumo diario de papel (máximo 30)
+            let puntosPapel;
+
+            if (hojas <= 5) {
+                puntosPapel = 30;
+            } else if (hojas <= 10) {
+                puntosPapel = 24;
+            } else if (hojas <= 20) {
+                puntosPapel = 15;
+            } else {
+                puntosPapel = 5;
+            }
+
+            // Puntos por nivel de reciclaje (máximo 30)
+            const puntosReciclaje = {
+                bajo: 5,
+                medio: 20,
+                alto: 30
+            };
+
+            // Puntaje total sobre 100
+            return (
+                puntosTransporte[transporte] +
+                puntosPapel +
+                puntosReciclaje[reciclaje]
+            );
+        }
+
+
+        // ==========================================
+        // 4. INTERPRETACIÓN DEL RESULTADO
+        // ==========================================
+
+        function interpretarPuntos(puntos) {
+
+            if (puntos >= 80) {
+                return "¡Excelente! Tus hábitos contribuyen positivamente al cuidado del medio ambiente.";
+            }
+
+            if (puntos >= 60) {
+                return "¡Buen trabajo! Puedes seguir mejorando tus hábitos ecológicos.";
+            }
+
+            if (puntos >= 40) {
+                return "Vas por buen camino. Intenta utilizar alternativas más sostenibles.";
+            }
+
+            return "Puedes mejorar tu impacto ambiental reduciendo el consumo de papel y reciclando más.";
+        }
+
+
+        // ==========================================
+        // 5. EVENTO PRINCIPAL DEL FORMULARIO
+        // ==========================================
+
+        const formulario = document.getElementById("ecoForm");
+
+        formulario.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            // Obtener los valores del formulario
+            const transporte =
+                document.getElementById("transporte").value;
+
+            const papelInput =
+                document.getElementById("papel");
+
+            const reciclaje =
+                document.getElementById("reciclaje").value;
+
+            const hojas = papelInput.valueAsNumber;
+
+            const mensaje = document.getElementById("mensaje");
+            const resultados = document.getElementById("resultados");
+
+            // Ocultar resultados anteriores
+            resultados.hidden = true;
+            mensaje.textContent = "";
+
+            // Validar los campos
+            if (!transporte || !reciclaje || papelInput.value === "") {
+                mensaje.textContent =
+                    "Error: debes completar todos los campos.";
+                return;
+            }
+
+            if (!Number.isInteger(hojas) || hojas < 0 || hojas > 500) {
+                mensaje.textContent =
+                    "Error: ingresa una cantidad entera de hojas entre 0 y 500.";
+                return;
+            }
+
+            // Ejecutar los cálculos
+            const huellaCO2 = calcularCO2(
+                transporte,
+                hojas,
+                reciclaje
+            );
+
+            const ecoPoints = calcularEcoPoints(
+                transporte,
+                hojas,
+                reciclaje
+            );
+
+            // Mostrar resultados
+            document.getElementById("co2Resultado").textContent =
+                huellaCO2.toFixed(3);
+
+            document.getElementById("ecoResultado").textContent =
+                ecoPoints + " / 100";
+
+            document.getElementById("interpretacion").textContent =
+                interpretarPuntos(ecoPoints);
+
+            resultados.hidden = false;
+
+        });
+
+    </script>
+
 </body>
 </html>
